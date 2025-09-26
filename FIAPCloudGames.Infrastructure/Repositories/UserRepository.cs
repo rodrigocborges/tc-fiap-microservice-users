@@ -2,21 +2,25 @@
 using FIAPCloudGames.Domain.Interfaces;
 using FIAPCloudGames.Infrastructure.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace FIAPCloudGames.Infrastructure.Repositories
 {
     public class UserRepository : IUserRepository
     {
         private readonly AppDbContext _context;
-        public UserRepository(AppDbContext context)
+        private readonly IEventRepository _event;
+        public UserRepository(AppDbContext context, IEventRepository @event)
         {
             _context = context;
+            _event = @event;
         }
 
         public async Task<Guid> Create(User model)
         {
             await _context.Users.AddAsync(model);
             await _context.SaveChangesAsync();
+            await _event.Save(new DomainEvent(model.Id, "UserCreated", JsonConvert.SerializeObject(new { model.Id, model.Name, model.Email, model.Role })));
             return model.Id;
         }
 
@@ -27,6 +31,7 @@ namespace FIAPCloudGames.Infrastructure.Repositories
                 return;
             _context.Users.Remove(model);
             await _context.SaveChangesAsync();
+            await _event.Save(new DomainEvent(id, "UserDeleted"));
         }
 
         public async Task<User?> Find(Guid id)
@@ -42,6 +47,7 @@ namespace FIAPCloudGames.Infrastructure.Repositories
         {
             _context.Users.Update(model);
             await _context.SaveChangesAsync();
+            await _event.Save(new DomainEvent(model.Id, "UserUpdated", JsonConvert.SerializeObject(new { model.Id, model.Name, model.Email, model.Role })));
         }
     }
 }
