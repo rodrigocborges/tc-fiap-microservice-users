@@ -105,7 +105,7 @@ public static class UserEndpoints
             return Results.Ok();
         }).RequireAuthorization();
 
-        group.MapPatch("/update-password/{id:guid}", async (IUserService service, [FromRoute] Guid id, [FromBody] UpdateUserPasswordRequest request, HttpContext httpContext) => {
+        group.MapPatch("/update-password/{id:guid}", async (IEventRepository _event, IUserService service, [FromRoute] Guid id, [FromBody] UpdateUserPasswordRequest request, HttpContext httpContext) => {
             if (request == null)
                 return Results.BadRequest(new GenericMessageResponse { Message = "Invalid body" });
 
@@ -124,13 +124,13 @@ public static class UserEndpoints
                 return Results.BadRequest(new GenericMessageResponse { Message = "User not found!" });
 
             userFound.UpdatePassword(newPassword: request.Password);
-
             await service.Update(userFound);
+            await _event.Save(new Domain.Entities.DomainEvent(id, "PasswordUpdated"));
 
             return Results.Ok();
         }).RequireAuthorization();
 
-        group.MapPost("/login", async (IConfiguration config, IUserService service, [FromBody] UserLoginRequest request) => {
+        group.MapPost("/login", async (IConfiguration config, IEventRepository _event, IUserService service, [FromBody] UserLoginRequest request) => {
             if (request == null)
                 return Results.BadRequest(new GenericMessageResponse { Message = "Invalid body" });
 
@@ -139,6 +139,7 @@ public static class UserEndpoints
                 return Results.BadRequest(new GenericMessageResponse { Message = "Wrong email or password!" });
 
             string token = JwtGenerator.Generate(user: userFound, config: config);
+            await _event.Save(new Domain.Entities.DomainEvent(userFound.Id, "UserLoggedIn"));
 
             return Results.Ok(new UserLoginResponse { Id = userFound.Id, Token = token });
         }).AllowAnonymous();

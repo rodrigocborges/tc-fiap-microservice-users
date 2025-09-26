@@ -400,3 +400,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 /FIAPCloudGames.API/appsettings.json
+/FIAPCloudGames.API/appsettings.Development.json
+*.db
+/FIAPCloudGames.API/event_source-log.db

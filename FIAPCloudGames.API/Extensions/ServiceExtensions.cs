@@ -2,6 +2,7 @@
 using FIAPCloudGames.Domain.Interfaces;
 using FIAPCloudGames.Infrastructure.DatabaseContext;
 using FIAPCloudGames.Infrastructure.Repositories;
+using LiteDB;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -77,6 +78,8 @@ public static class ServiceExtensions
         builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("Main")));
 
         #region Injeção de dependências
+        builder.Services.AddSingleton<ILiteDatabase, LiteDatabase>(_ => new LiteDatabase("event_source.db"));
+        builder.Services.AddTransient<IEventRepository, EventRepository>();
         builder.Services.AddTransient<IUserRepository, UserRepository>();
         builder.Services.AddTransient<IUserService, UserService>();
         #endregion

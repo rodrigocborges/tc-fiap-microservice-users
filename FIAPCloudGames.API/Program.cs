@@ -10,6 +10,7 @@ var app = builder.Build();
 app.UseServices();
 
 app
+    .MapEventSourcingEndpoints()
     .MapUserEndpoints();
 
 app.Run();
