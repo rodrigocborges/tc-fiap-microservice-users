@@ -1,38 +1,29 @@
 ﻿using FIAPCloudGames.Domain.Entities;
 using FIAPCloudGames.Domain.Interfaces;
-using LiteDB;
+// A referência ao LiteDB pode ser removida
+// using LiteDB; 
 
 namespace FIAPCloudGames.Infrastructure.Repositories
 {
     public class EventRepository : IEventRepository
     {
-        private readonly ILiteDatabase _db;
-        private const string _collectionName = "domain_events";
-
-        public EventRepository(ILiteDatabase db)
+        public EventRepository()
         {
-            _db = db;
         }
 
         public Task<IEnumerable<DomainEvent>> GetAll(int skip, int take)
         {
-            var events = _db.GetCollection<DomainEvent>(_collectionName);
-            var results = events.FindAll()?.Skip(skip)?.Take(take);
-            return Task.FromResult(results ?? new List<DomainEvent>());
+            return Task.FromResult(new List<DomainEvent>().AsEnumerable());
         }
 
         public Task<IEnumerable<DomainEvent>> GetAllByAggregateId(Guid aggregateId)
         {
-            var events = _db.GetCollection<DomainEvent>(_collectionName);
-            events.EnsureIndex(e => e.AggregateId);
-            var results = events.Find(e => e.AggregateId == aggregateId);
-            return Task.FromResult(results ?? new List<DomainEvent>());
+            return Task.FromResult(new List<DomainEvent>().AsEnumerable());
         }
 
         public Task Save(DomainEvent domainEvent)
         {
-            var events = _db.GetCollection<DomainEvent>(_collectionName);
-            events.Insert(domainEvent);
+            Console.WriteLine($"[DEBUG] Event Sourcing está desativado. Evento '{domainEvent.EventType}' não foi guardado.");
             return Task.CompletedTask;
         }
     }
