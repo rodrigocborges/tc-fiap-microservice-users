@@ -78,7 +78,7 @@ public static class ServiceExtensions
         builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("Main")));
 
         #region Injeção de dependências
-        // builder.Services.AddSingleton<ILiteDatabase, LiteDatabase>(_ => new LiteDatabase("/home/event_source.db"));
+        builder.Services.AddSingleton<ILiteDatabase, LiteDatabase>(_ => new LiteDatabase("event_source.db"));
         builder.Services.AddTransient<IEventRepository, EventRepository>();
         builder.Services.AddTransient<IUserRepository, UserRepository>();
         builder.Services.AddTransient<IUserService, UserService>();
