@@ -56,7 +56,7 @@ kind: Service
 metadata:
   name: users-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: users-service
   ports:
