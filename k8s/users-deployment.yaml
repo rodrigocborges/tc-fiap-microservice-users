@@ -50,6 +50,11 @@ spec:
             secretKeyRef:
               name: user-secrets
               key: Jwt__Audience
+        - name: Jwt__ExpiresInMinutes
+          valueFrom:
+            secretKeyRef:
+              name: user-secrets
+              key: Jwt__ExpiresInMinutes
 ---
 apiVersion: v1
 kind: Service
